@@ -11,7 +11,7 @@ const double MIN_D1 = 1.0;
 const double MIN_DH = 1.0;
 const double DH_FIRST_GUESS = 1.0;
 
-static double tuning[] = {0.5, 1.0};
+static double tuning[] = {2.0, 1.0};
 
 // Calculates effective length of Birl in centimeters, given fundamental frequency of tube in Hertz.
 static inline double calcLS (double Fc) {
@@ -51,17 +51,6 @@ static inline double calcg (int index) {
 
 // TONE HOLES.
 
-static inline double calcLBh(int index, double LSh, int lLint) {
-//    double g = calcg(index);
-//    double lL = (double) lLint;
-//
-//    double gLSh = g * LSh;
-//    double nmrtr1 = (LSh + 0.5*gLSh - lL) * (LSh + 0.5*gLSh - lL);
-//    nmrtr1 /= gLSh;
-//    return nmrtr1 - (gLSh / 4.0);
-    double g = calcg(index);
-}
-
 // Calculates the effective length of the tube with a cut length of lH.
 
 static inline double calcLSh (int index, double Fc) {
@@ -100,17 +89,6 @@ static inline int calclH (int index, double d1, double LSh) {
     }
     return lH;
 }
-
-
-static inline double checkTuning(double d1, double dH, double LSh, double lL, double g) {
-    double LBh = dH * ((d1*d1)/(dH*dH)) - 0.45*d1;
-    double z = 0.5 * g * sqrt(1 + 4*(LBh/(g*LSh))) - 0.5*g;
-    return (SRATE*OVERSAMPLE)/(4 * (lL + (z*LSh)));
-
-}
-
-
-
 
 #endif
 
