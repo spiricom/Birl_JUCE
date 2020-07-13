@@ -18,7 +18,6 @@ public:
     double gain;
 //    double frequency;
 //    double filterfrequency;
-    AudioProcessorValueTreeState tree;
     int keys_[NUM_OF_KEYS];
     bool buttons_[NUM_OF_BUTTONS];
     int maxKeyArg[NUM_OF_KEYS];
@@ -56,7 +55,6 @@ public:
     void synthesize();
     void parameterSmooth();
     void scaleValues();
-    void changeTuning();
     void buttonListen();
     //==============================================================================
     tSVF filter1{};
@@ -72,7 +70,7 @@ private:
     tExpSmooth XY1_YEnv;
     tExpSmooth XY2_XEnv;
     tExpSmooth XY2_YEnv;
-    tExpSmooth keysEnv[11];
+    tExpSmooth keysEnv;
 
     
 //    tSawtooth saw1;

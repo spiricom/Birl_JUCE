@@ -2,15 +2,10 @@
 
 PhysicalModel::PhysicalModel()
 {
-
     numToneHoles_ = NUM_OF_KEYS;
     numTubes_ = NUM_OF_KEYS+1;
     tubeIndex_ = 0;
-    ::setTuning(EQUAL_TEMPERED);
 
-//    tune(239.9);
-    tubes_[0] = initTube(25);
-    
     
     dcBlocker_ = initDCFilter(0.995);
     dcBlocker2_ = initDCFilter(0.995);
@@ -35,152 +30,75 @@ PhysicalModel::PhysicalModel()
     srand((unsigned)time(NULL));
 
 }
-PhysicalModel::~PhysicalModel(){}
+PhysicalModel::~PhysicalModel() { }
 
-
-void PhysicalModel::setToneHoleIndex(int index) {
-    if (index < 0 || index >= numToneHoles_) {
-        printf("index out of range: %d\n", index);
+void PhysicalModel::setToneHoleRadius(int index, double radius) {
+    if (radius < MIN_TONEHOLE_RADIUS || radius > MAX_TONEHOLE_RADIUS) {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+            "Radius out of range",
+            "Error: Radius is out of range",
+            "OK");
         return;
     }
-    toneHoleIndex_ = index;
+    rth_[index] = radius;
+    scatter_[index] = -pow(radius,2) / ( pow(radius,2) + 2*pow(rb_,2) );
+
+    // Calculate toneHole coefficients.
+    double te = radius;
+    thCoeff_[index] = (te*2*(SRATE*OVERSAMPLE) - C_m) / (te*2*(SRATE*OVERSAMPLE) + C_m);
 }
-void PhysicalModel::setToneHole(double newValue) {
+
+void PhysicalModel::setToneHole(int index, double newValue) {
     double new_coeff;
-    int index = toneHoleIndex_;
-    double thCoeff = thCoeff_[index];
-    
-    if ( newValue <= 0.0 )
+    if (newValue < 0.0)
         new_coeff = 0.9995;
-    else if ( newValue >= 1.0 )
-        new_coeff = thCoeff;
+    else if (newValue >= 1.0)
+        new_coeff = thCoeff_[index];
     else
-        new_coeff = ( newValue * (thCoeff - 0.9995) ) + 0.9995;
-    setA1PoleZero( toneHoles_[index], new_coeff );
-    setB0PoleZero( toneHoles_[index], new_coeff );
+        new_coeff = newValue * (thCoeff_[index] - 0.9995) + 0.9995;
+//    toneHoles_[index] = initPoleZero();
+    setA1PoleZero(toneHoles_[index], new_coeff);
+    setB0PoleZero(toneHoles_[index], new_coeff);
 }
 
-void PhysicalModel::setToneHoleRadius(double newRadius) {
-     if (newRadius < MIN_TONEHOLE_RADIUS || newRadius > MAX_TONEHOLE_RADIUS) {
-         printf("Radius is too big or too small: %f\n", newRadius);
-         return;
-     }
-     int index = toneHoleIndex_;
-
-     rth_[index] = newRadius;
-     scatter_[index] = -pow(newRadius,2) / ( pow(newRadius,2) + 2*pow(rb_,2) );
-
-     // Calculate toneHole coefficients.
-     double te = newRadius;    // effective length of the open hole
-     thCoeff_[index] = (te*2*(SRATE*OVERSAMPLE) - C_m) / (te*2*(SRATE*OVERSAMPLE) + C_m);
- }
-void PhysicalModel::setLengthIndex(int index) {
-    if (index < 0 || index >= numTubes_) {
-        printf("index out of range: %d\n", index);
-        return;
-    }
-    tubeIndex_ = index;
+void PhysicalModel::setLength(int index, int length) {
+//    if (index < 0 || index >= numTubes_) {
+//        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+//            "Range Error",
+//            "Error: Index is out of range",
+//            "OK");
+//        return;
+//    }
+//    if (length < 0 || length >= MAX_TUBE_LENGTH) {
+//        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+//            "Range Error",
+//            "Error: Length is out of range",
+//            "OK");
+//        return;
+//    }
+//    tubeLengths_[index] = length;
+//    tubes_[index] = initTube(length);
 }
-void PhysicalModel::setLength(int newlen) {
-    if (newlen < 0 || newlen >= MAX_TUBE_LENGTH) {
-        printf("length out of range: %d\n", newlen);
-        return;
-    }
-    int index = tubeIndex_;
 
-    tubeLengths_[index] = newlen;
-    tubes_[index] = initTube(newlen);
-}
 void PhysicalModel::setBreathPressure(double input) {
     breathPressure_ = input;
 }
 
-void PhysicalModel::setLPCutoff(double cut) {
-    cut = clip(cut, 30.0, 16000.0);
-    printf("lp cutoff: %f\n", cut);
-    setCutoffSVF(lp_, cut);
-    setCutoffSVF(lp2_, cut);
-}
-void PhysicalModel::setLPQ(double Q) {
-    Q = clip(Q, 0.0, 1.0);
-    printf("lp Q: %f\n", Q);
-    setQSVF(lp_, Q);
-    setQSVF(lp2_, Q);
-}
 
-void PhysicalModel::setPFCutoff(double cut) {
-    cut = clip(cut, 30.0, 16000.0);
-    printf("pf cutoff: %f\n", cut);
-    setCutoffSVF(pf_, cut);
-    setCutoffSVF(pf2_, cut);
-}
 
-void PhysicalModel::setPFQ(double Q) {
-    Q = clip(Q, 0.0, 1.0);
-    printf("pf Q: %f\n", Q);
-    setQSVF(pf_, Q);
-    setQSVF(pf2_, Q);
-}
-
-void PhysicalModel::setNoiseBPCutoff(double cut) {
-    cut = clip(cut, 30.0, 16000.0);
-    printf("noiseBP cutoff: %f\n", cut);
-    setCutoffSVF(noiseBP_, cut);
-}
-
-void PhysicalModel::setNoiseGain(double gain) {
-    gain = clip(gain, 0.0, 1.0);
-    printf("noise gain: %f\n", gain);
-    noiseGain_ = gain;
-}
-
-void PhysicalModel::setNoiseBPQ(double Q) {
-    Q = clip(Q, 0.0, 1.0);
-    printf("noiseBP Q: %f\n", Q);
-    setQSVF(noiseBP_, Q);
-}
-
-void PhysicalModel::setShaperDrive(double d) {
-    d = clip(d, 0.0, 1.0);
-    printf("m_drive_: %f\n", d);
-    m_drive_ = d;
-}
-
-void PhysicalModel::setShaperMix(double d) {
-    d = clip(d, 0.0, 1.0);
-    printf("shaper mix: %f\n", shaperMix_);
-    shaperMix_ = d;
-}
-
-void PhysicalModel::setTuningWrapper(int t) {
-    ::setTuning((tuningSystem) t);
-}
-
-void PhysicalModel::setNumToneHoles(int toneholes){
-    numToneHoles_ = toneholes;
-    toneHoleIndex_ = toneholes + 1;
-}
-
-void PhysicalModel::setCustomTuning(double freqs[NUM_NOTES]) {
-//    double freqs[] = {f9, f8, f7, f6, f5, f4, f3, f2, f1, f0, fn1};
-    populateCustomTuning(freqs);
-    tune(freqs[NUM_NOTES - 1]);
-}
 void PhysicalModel::calcTHCoeffs() {
-    // Calculate initial tone hole three-port scattering coefficients
-    for (int i = 0; i < MAX_TONEHOLES; i++) {
-        scatter_[i] = -pow(rth_[i],2) / ( pow(rth_[i],2) + 2*pow(rb_,2) );
+    scatter_[0] = -pow(rth_[0],2) / ( pow(rth_[0],2) + 2*pow(rb_,2) );
+    
+    thCoeff_[0] = (rth_[0]*2*(SRATE*OVERSAMPLE) - C_m) / (rth_[0]*2*(SRATE*OVERSAMPLE) + C_m);
 
-        // Calculate toneHole coefficients and set for initially open.
-        thCoeff_[i] = (rth_[i]*2*(SRATE*OVERSAMPLE) - C_m) / (rth_[i]*2*(SRATE*OVERSAMPLE) + C_m);
-
-        // Initialize tone holes.
-        toneHoles_[i] = initPoleZero();
-        setA1PoleZero(toneHoles_[i], -thCoeff_[i]);
-        setB0PoleZero(toneHoles_[i], thCoeff_[i]);
-        setB1PoleZero(toneHoles_[i], -1.0);
-    }
+    // Initialize tone holes.
+    toneHoles_[0] = initPoleZero();
+    setA1PoleZero(toneHoles_[0], -thCoeff_[0]);
+    setB0PoleZero(toneHoles_[0], thCoeff_[0]);
+    setB1PoleZero(toneHoles_[0], -1.0);
 }
+
+#if 0
 void PhysicalModel::tune(double Fc) {
 //    double LS = calcLS(Fc);
 //    int LC = calcLC(LS);
@@ -224,13 +142,45 @@ void PhysicalModel::tune(double Fc) {
 //    }
 //    calcTHCoeffs();
 }
+#endif
+
+void PhysicalModel::tune(double Fc) {
+    double effectiveLength = calcLS(Fc);
+    int cutLength = calcLC(effectiveLength);
+    double boreDiameter = calcd1(cutLength, effectiveLength);
+    
+    tubeLengths_[0] = calclH(0, boreDiameter, calcLSh(0, Fc));
+    tubeLengths_[1] = calclH(1, boreDiameter, calcLSh(1, Fc));
+    
+//    tubeLengths_[0] = calclL(boreDiameter, 0, effectiveLength);
+//    tubeLengths_[1] = calclL(boreDiameter, 1, effectiveLength);
+    
+    if (tubeLengths_[0] == 0 || tubeLengths_[1] == 0) {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+            "Int Cast Error",
+            "Error: Cut length cast down to 0. Use a different tuning or try oversampling.",
+            "OK");
+        return;
+    }
+    
+    tubes_[0] = initTube(tubeLengths_[0]);
+    tubes_[1] = initTube(tubeLengths_[1]);
+    
+    // Main bore radius, in centimeters.
+    rb_ = boreDiameter / 2.0;
+    
+    // Calculate the toneHole radii.
+    rth_[0] = 0.5 * calcdH(0, boreDiameter, tubeLengths_[0], calcLSh(0, Fc));
+    
+    calcTHCoeffs();
+}
+
 
 double PhysicalModel::interpolateLinear(double a, double b, double alpha) {
     return (alpha * a) + ((1.0-alpha) * b);
 }
  
 #if 0
-
 double PhysicalModel::birlTick()
 {
     double breathInterp[OVERSAMPLE];
@@ -258,16 +208,6 @@ double PhysicalModel::birlTick()
         double reedLookup = pressureDiff * reedTable( pressureDiff );
 //        breath = tanhClip(breath + reedLookup);
         breath = LEAF_clip(-1.0, breath + reedLookup, 1.0);
-
-
-        // debug("%d\n", tubeLengths_[0]);
-        // Helps reduce high-pitched noise.
-        // breath = inputBiquad(biquad_, breath);
-//        breath = interpolateLinear(shaper(breath, m_drive_), breath, shaperMix_);
-        // breath = inputSVFPeak(pf_, breath);
-        // breath = inputSVFLP(lp_, breath);
-        // breath = inputDCFilter(dcBlocker_, breath);
-
         if (breath > 1.0 || breath < -1.0) {
             printf("breath going out of bounds of -1 to 1: %f\n", breath);
         }
@@ -327,32 +267,22 @@ double PhysicalModel::birlTick()
     }
 
     count++;
-
-    // debug("%.5f -0-> ", breath);
-    // for (int i = 0; i < numToneHoles_; i++) {
-    //     debug("\t%.5f\t-%d->", pbp_[i], i+1);
-    // }
-    // debug("\n");
-    // for (int i = 0; i < numToneHoles_; i++) {
-    //     debug("%.5f\t<-%d-\t", pam_[i], i);
-    // }
-    // debug("%.5f\n", bellReflected);
-    // debug("range: %f - %f\n", min, max);
-    // debug("\n");
-
-
     // Clipping, account for oversampling, and gain.
     outsamp /= (double) OVERSAMPLE;
     outsamp = tanhClip(outsamp);
     outsamp *= outputGain_;
     return outsamp;
 }
-
 #endif
 
 double PhysicalModel::birlTick() {
     double outsamp = 0.0;
     double bellReflected;
+    
+    double pap;
+    double pbm;
+    double pthm;
+    double scatter;
     
     double breath = breathPressure_;
     double noise = (double) rand() / (double) RAND_MAX;
@@ -364,15 +294,81 @@ double PhysicalModel::birlTick() {
     double reedLookup = pressureDiff * reedTable (pressureDiff);
     breath = LEAF_clip(-1.0, breath + reedLookup, 1.0);
     
-    double bell = accessDelayLine(tubes_[0]->upper);
-    outsamp = bell;
-    bellReflected = bell * -0.995;
+    // ONE HOLE.
+    int a = 0;
+    int b = 1;
     
-    inputDelayLine(tubes_[0]->upper, breath);
-    inputDelayLine(tubes_[0]->lower, bellReflected);
-    tanhClip(outsamp);
+    pap = accessDelayLine(tubes_[a]->upper);
+    pbm = accessDelayLine(tubes_[b]->lower);
+    pthm = z1PoleZero(toneHoles_[0]);
+    
+    scatter = scatter_[0] * (pap + pbm - (2 * pthm));
+    pbp_[0] = pap + scatter;
+    pam_[0] = pbm + scatter;
+    pthp_[0] = pap + scatter + pbm - pthm;
+    
+    outsamp += pap + pam_[0];
+    
+    double bell = accessDelayLine(tubes_[b]->upper);
+    outsamp += bell;
+    bellReflected = bell * -0.995;
+
+    // FIRST TUBE.
+    inputDelayLine(tubes_[a]->upper, breath);
+    inputDelayLine(tubes_[a]->lower, pam_[0]);
+
+    // SECOND TUBE.
+    inputDelayLine(tubes_[b]->upper, pbp_[0]);
+    inputDelayLine(tubes_[b]->lower, bellReflected);
+    
+    // TONEHOLE.
+    inputPoleZero(toneHoles_[0], pthp_[0]);
+
+
+    outsamp = tanhClip(outsamp);
     
     return outsamp;
 }
 
+
+void PhysicalModel::setLPCutoff(double cut) {
+    cut = clip(cut, 30.0, 16000.0);
+    setCutoffSVF(lp_, cut);
+    setCutoffSVF(lp2_, cut);
+}
+void PhysicalModel::setLPQ(double Q) {
+    Q = clip(Q, 0.0, 1.0);
+    setQSVF(lp_, Q);
+    setQSVF(lp2_, Q);
+}
+void PhysicalModel::setPFCutoff(double cut) {
+    cut = clip(cut, 30.0, 16000.0);
+    setCutoffSVF(pf_, cut);
+    setCutoffSVF(pf2_, cut);
+}
+void PhysicalModel::setPFQ(double Q) {
+    Q = clip(Q, 0.0, 1.0);
+    setQSVF(pf_, Q);
+    setQSVF(pf2_, Q);
+}
+void PhysicalModel::setNoiseBPCutoff(double cut) {
+    cut = clip(cut, 30.0, 16000.0);
+    setCutoffSVF(noiseBP_, cut);
+}
+void PhysicalModel::setNoiseGain(double gain) {
+    gain = clip(gain, 0.0, 1.0);
+    noiseGain_ = gain;
+}
+void PhysicalModel::setNoiseBPQ(double Q) {
+    Q = clip(Q, 0.0, 1.0);
+    setQSVF(noiseBP_, Q);
+}
+void PhysicalModel::setShaperDrive(double d) {
+    d = clip(d, 0.0, 1.0);
+    m_drive_ = d;
+}
+void PhysicalModel::setShaperMix(double d) {
+    d = clip(d, 0.0, 1.0);
+    shaperMix_ = d;
+}
 

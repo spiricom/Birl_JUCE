@@ -15,12 +15,10 @@ public:
     PhysicalModel();
     ~PhysicalModel();
     
-    void setNumToneHoles(int);
-    void setToneHoleIndex(int);
-    void setToneHole(double);
-    void setToneHoleRadius(double);
-    void setLengthIndex(int);
-    void setLength(int);
+    void setToneHoleRadius(int, double);
+    void setToneHole(int, double);
+    void setLength(int, int);
+    
     void setBreathPressure(double);
     void setLPCutoff(double);
     void setLPQ(double);
@@ -31,8 +29,8 @@ public:
     void setNoiseBPQ(double);
     void setShaperDrive(double);
     void setShaperMix(double);
-    void setTuningWrapper(int);
-    void setCustomTuning(double freqs[NUM_NOTES]);
+    
+
     void calcTHCoeffs();
     void tune(double);
     double interpolateLinear(double a, double b, double alpha);

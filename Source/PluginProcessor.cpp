@@ -11,17 +11,9 @@ BirlOneHoleAudioProcessor::BirlOneHoleAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        )
-, tree (*this, nullptr, "PARAMETERS", {
-    std::make_unique<AudioParameterInt> ("tuning", "Tuning", 0, 4, 0),
-})
 
 #endif
 {
-    birl.setNumToneHoles(NUM_OF_KEYS);
-    birl.setShaperDrive(0.0);
-    birl.setNoiseBPQ(0.5);
-    birl.setNoiseGain(0.5);
-    birl.setNoiseBPCutoff(200.0);
 
 }
 
@@ -105,10 +97,18 @@ void BirlOneHoleAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     tExpSmooth_init(&XY1_YEnv, 0.0f, 0.02f);
     tExpSmooth_init(&XY2_XEnv, 0.0f, 0.02f);
     tExpSmooth_init(&XY2_YEnv, 0.0f, 0.02f);
-
-    for (int i = 0; i < NUM_OF_KEYS; ++i){
-        tExpSmooth_init(&keysEnv[i], 0.0f, 0.01f);
+    tExpSmooth_init(&keysEnv, 0.0f, 0.01f);
+    
+    birl.tune(100);
+    birl.setShaperDrive(0.0);
+    birl.setNoiseBPQ(0.5);
+    birl.setNoiseGain(0.5);
+    birl.setNoiseBPCutoff(200.0);
+    
+    for (int i = 0; i < NUM_OF_KEYS; ++i) {
+        maxKeyArg[i] = 1;
     }
+
 }
 
 void BirlOneHoleAudioProcessor::releaseResources()
@@ -140,57 +140,19 @@ bool BirlOneHoleAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
   #endif
 }
 #endif
-void BirlOneHoleAudioProcessor::synthesize() {
-//    birl.setToneHoleIndex(0);
-//    birl.setToneHole(0.0-tExpSmooth_tick(&keysEnv[0]));
-//    birl.setToneHoleIndex(1);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[1]));
-//    birl.setToneHoleIndex(2);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[2]));
-//    birl.setToneHoleIndex(3);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[3]));
-//    birl.setToneHoleIndex(4);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[4]));
-//    birl.setToneHoleIndex(5);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[5]));
-//    birl.setToneHoleIndex(6);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[6]));
-//    birl.setToneHoleIndex(7);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[7]));
-//    birl.setToneHoleIndex(8);
-//    birl.setToneHole(1.0-tExpSmooth_tick(&keysEnv[8]));
-}
 
 void BirlOneHoleAudioProcessor::parameterSmooth(){
     tExpSmooth_setDest(&XY1_XEnv, 1.0);
     tExpSmooth_setDest(&XY1_YEnv, 1.0);
     tExpSmooth_setDest(&XY2_XEnv, 1.0);
     tExpSmooth_setDest(&XY2_YEnv, 1.0);
+    tExpSmooth_setDest(&keysEnv, keysGradient[0]);
     
 //    for (int i = 0; i < NUM_OF_KEYS; ++i) {
 //        tExpSmooth_setDest(&keysEnv[i], keysGradient[i]);
 //    }
 }
 
-void BirlOneHoleAudioProcessor::changeTuning(){
-    int selectedTuning = *tree.getRawParameterValue("tuning");
-    switch (selectedTuning) {
-        case 0:
-            ::setTuning(JUST_INTONATION);
-            break;
-        case 1:
-            ::setTuning(EQUAL_TEMPERED);
-            break;
-        case 3:
-            ::setTuning(MEANTONE);
-            break;
-        case 4:
-            ::setTuning(HIGHLAND_BAGPIPE);
-            break;
-        default:
-            break;
-    }
-}
 void BirlOneHoleAudioProcessor::scaleValues() {
     for (int tonehole = 0; tonehole < NUM_OF_KEYS; ++tonehole) {
         if (keys_[tonehole] > maxKeyArg[tonehole]) {
@@ -222,9 +184,9 @@ void BirlOneHoleAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     }
     
     for (int sampIndex = 0; sampIndex < buffer.getNumSamples(); ++sampIndex) {
-//        scaleValues();
+        scaleValues();
         parameterSmooth();
-//        synthesize();
+        birl.setToneHole(0, tExpSmooth_tick(&keysEnv));
         birl.setBreathPressure(gain);
         audioBufferTick = birl.birlTick();
 

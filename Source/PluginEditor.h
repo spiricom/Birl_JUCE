@@ -17,7 +17,6 @@ public:
 private:
     BirlOneHoleAudioProcessor& processor;
     BirlOSCReceiver slidersAndKeys;
-    ComboBox tuningMenu_;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BirlOneHoleAudioProcessorEditor)
