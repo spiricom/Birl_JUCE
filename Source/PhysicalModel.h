@@ -8,7 +8,6 @@
 #include "Birl_Tuning.h"
 
 
-
 class PhysicalModel
 {
 public:
@@ -33,8 +32,10 @@ public:
 
     void calcTHCoeffs();
     void tune(double);
+    void retune(double);
     double interpolateLinear(double a, double b, double alpha);
     tSVF inLoopLP; // in loop low pass
+  
     double birlTick();
 
 
@@ -53,6 +54,7 @@ protected:
     
     Tube *tubes_ [MAX_TUBES];
     PoleZero *toneHoles_[MAX_TONEHOLES];
+//    FracTube *ftubes_[MAX_TUBES];
     
     
     DCFilter *dcBlocker_;

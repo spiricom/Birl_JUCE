@@ -7,11 +7,11 @@
 const int NUM_NOTES = 2;
 
 // CONSTS.
-const double MIN_D1 = 1.0;
-const double MIN_DH = 1.0;
-const double DH_FIRST_GUESS = 1.0;
+const double MIN_D1 = 0.5;
+const double MIN_DH = 0.03;
+const double DH_FIRST_GUESS = 0.03;
 
-static double tuning[] = {2.0, 1.0};
+static double tuning[] = {1.0, 1.0};
 
 // Calculates effective length of Birl in centimeters, given fundamental frequency of tube in Hertz.
 static inline double calcLS (double Fc) {
@@ -28,7 +28,6 @@ static inline int calcLC(double LS) {
     int LC = (int) LS;
     double d1 = calcd1(LC, LS);
     while (d1 < MIN_D1) {
-        printf("calcLC: d1 = %f for this value of LC so we're shortening LC!!!!!!\n", d1);
         LC -= 1;
         d1 = calcd1(LC, LS);
     }
@@ -60,21 +59,24 @@ static inline double calcLSh (int index, double Fc) {
 }
 
 // Calculates the tonehole diameter.
-static inline double calcdH(int index, double d1, int lH, double LSh) {
+static inline double calcdH(int index, double d1, int lH, double Fc) {
+    // Calculate LSh.
+    double LSh = calcLSh(index, Fc);
     // Calculate z.
     double z = (double) lH / LSh;
     // Calculate g.
     double g = calcg(index);
     // Calculate LBh.
     double LBh;
-    double x2 = g * LSh / 4.0; // Try LS as well.
+    double LS = calcLS(Fc);
+    double x2 = g * LS / 4.0; // Try LS as well.
     double x1 = pow(((z + 0.5*g) / (0.5*g)), 2) - 1;
     LBh = x1 * x2;
     // Solve for dH.
     double dH;
     double chunk = (LBh + 0.45 * d1) / (d1*d1);
     double radical = sqrt(1.0 + 4.0 * lH * chunk);
-    dH = (1 + radical) / (2 * chunk); // Also try 1 - radical!
+    dH = (1 + radical) / (2 * chunk);
     return dH;
 }
 

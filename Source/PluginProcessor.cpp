@@ -19,7 +19,7 @@ BirlOneHoleAudioProcessor::BirlOneHoleAudioProcessor()
 
 BirlOneHoleAudioProcessor::~BirlOneHoleAudioProcessor()
 {
-    //body
+    
 }
 
 //==============================================================================
@@ -27,7 +27,6 @@ const String BirlOneHoleAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
-
 bool BirlOneHoleAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
@@ -36,7 +35,6 @@ bool BirlOneHoleAudioProcessor::acceptsMidi() const
     return false;
    #endif
 }
-
 bool BirlOneHoleAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
@@ -45,7 +43,6 @@ bool BirlOneHoleAudioProcessor::producesMidi() const
     return false;
    #endif
 }
-
 bool BirlOneHoleAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
@@ -54,32 +51,26 @@ bool BirlOneHoleAudioProcessor::isMidiEffect() const
     return false;
    #endif
 }
-
 double BirlOneHoleAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
-
 int BirlOneHoleAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
-
 int BirlOneHoleAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
-
 void BirlOneHoleAudioProcessor::setCurrentProgram (int index)
 {
 }
-
 const String BirlOneHoleAudioProcessor::getProgramName (int index)
 {
     return {};
 }
-
 void BirlOneHoleAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
@@ -89,7 +80,7 @@ void BirlOneHoleAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     LEAF_init(sampleRate, samplesPerBlock, myMemory, 500000, []() {return (float)rand() / RAND_MAX; });
     tSVF_init(&birl.inLoopLP, SVFTypeLowpass, 3000.0f, 0.7f);
-    tCycle_init(&sin);
+//    tCycle_init(&birl.birlSine);
     tADSR_init(&breathPosEnv, 500, 500, 1000, 1000);
     
     /* These are for the X-Y keys */
@@ -99,7 +90,6 @@ void BirlOneHoleAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     tExpSmooth_init(&XY2_YEnv, 0.0f, 0.02f);
     tExpSmooth_init(&keysEnv, 0.0f, 0.01f);
     
-    birl.tune(100);
     birl.setShaperDrive(0.0);
     birl.setNoiseBPQ(0.5);
     birl.setNoiseGain(0.5);
@@ -146,24 +136,13 @@ void BirlOneHoleAudioProcessor::parameterSmooth(){
     tExpSmooth_setDest(&XY1_YEnv, 1.0);
     tExpSmooth_setDest(&XY2_XEnv, 1.0);
     tExpSmooth_setDest(&XY2_YEnv, 1.0);
-    tExpSmooth_setDest(&keysEnv, keysGradient[0]);
-    
+    tExpSmooth_setDest(&keysEnv, keys_[0]);
+            
 //    for (int i = 0; i < NUM_OF_KEYS; ++i) {
-//        tExpSmooth_setDest(&keysEnv[i], keysGradient[i]);
+//        tExpSmooth_setDest(&keysEnv[i], keys_[i]);
 //    }
 }
 
-void BirlOneHoleAudioProcessor::scaleValues() {
-    for (int tonehole = 0; tonehole < NUM_OF_KEYS; ++tonehole) {
-        if (keys_[tonehole] > maxKeyArg[tonehole]) {
-            maxKeyArg[tonehole] = keys_[tonehole];
-        }
-        if (keys_[tonehole] < minKeyArg[tonehole]) {
-            minKeyArg[tonehole] = keys_[tonehole];
-        }
-        keysGradient[tonehole] = (double)(keys_[tonehole] - minKeyArg[tonehole]) / (double)(maxKeyArg[tonehole] - minKeyArg[tonehole]);
-    }
-}
 void BirlOneHoleAudioProcessor::buttonListen() {
     // listen for buttons
 }
@@ -184,9 +163,8 @@ void BirlOneHoleAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     }
     
     for (int sampIndex = 0; sampIndex < buffer.getNumSamples(); ++sampIndex) {
-        scaleValues();
+        birl.retune(0.7*frequency);
         parameterSmooth();
-        birl.setToneHole(0, tExpSmooth_tick(&keysEnv));
         birl.setBreathPressure(gain);
         audioBufferTick = birl.birlTick();
 

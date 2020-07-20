@@ -34,6 +34,7 @@ protected:
     double currentBreathPos_;
     double currentBreathNeg_;
     bool isExhaling_;
+
 };
 
 #endif

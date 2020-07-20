@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="dE4lKE" name="BirlOneHole" projectType="audioplug" jucerVersion="5.4.7">
+<JUCERPROJECT id="dE4lKE" name="BirlOneHole" projectType="audioplug" displaySplashScreen="1"
+              jucerFormatVersion="1">
   <MAINGROUP id="m2ACw2" name="BirlOneHole">
     <GROUP id="{912D1598-160D-596B-6406-BF4E4B3B23BD}" name="Source">
       <FILE id="a3jjKp" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -23,6 +24,7 @@
       <FILE id="yRTBMO" name="PhysicalModelEditor.h" compile="0" resource="0"
             file="Source/PhysicalModelEditor.h"/>
       <FILE id="YLdEh7" name="Birl_Tube.h" compile="0" resource="0" file="Source/Birl_Tube.h"/>
+      <FILE id="ezTr8a" name="SlideTuning.h" compile="0" resource="0" file="Source/SlideTuning.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>

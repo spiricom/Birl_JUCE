@@ -7,7 +7,7 @@
 #include "PhysicalModel.h"
 
 #define MEM_SIZE 50000
-#define OPENHOLE_FREQ 349.0
+#define OPENHOLE_FREQ 440.0
 
 class BirlOneHoleAudioProcessor  : public AudioProcessor, public PhysicalModel
 {
@@ -16,16 +16,9 @@ public:
     ~BirlOneHoleAudioProcessor();
     
     double gain;
-//    double frequency;
-//    double filterfrequency;
-    int keys_[NUM_OF_KEYS];
-    bool buttons_[NUM_OF_BUTTONS];
-    int maxKeyArg[NUM_OF_KEYS];
-    int minKeyArg[NUM_OF_KEYS];
-    
-    double keysGradient [NUM_OF_KEYS];
-    
-    
+    double octave;
+    double frequency = OPENHOLE_FREQ;
+        
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
    #ifndef JucePlugin_PreferredChannelConfigurations
@@ -47,6 +40,7 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
+    
 
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
@@ -54,7 +48,6 @@ public:
     //==============================================================================
     void synthesize();
     void parameterSmooth();
-    void scaleValues();
     void buttonListen();
     //==============================================================================
     tSVF filter1{};
@@ -72,7 +65,6 @@ private:
     tExpSmooth XY2_YEnv;
     tExpSmooth keysEnv;
 
-    
 //    tSawtooth saw1;
 //    tSawtooth saw2;
 //    tSawtooth saw3;

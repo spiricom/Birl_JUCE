@@ -195,6 +195,13 @@
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_VST_utils.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		0B6F2414A55C204803FACB03 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = SlideTuning.h;
+			path = ../../Source/SlideTuning.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		0D5F08AA8CB1E60595F98D0D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -489,6 +496,13 @@
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_AU_1.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		8F2062F789EB64935860C216 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = JucePluginDefines.h;
+			path = ../../JuceLibraryCode/JucePluginDefines.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		92236436E2C0C14AE5FCB479 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -715,6 +729,7 @@
 				4F591BDEAEE035A345774180,
 				B325C25A00559674E0E6A11D,
 				2A2B61BB0EC06A59343C5C6F,
+				0B6F2414A55C204803FACB03,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -777,6 +792,7 @@
 				F1BFAE5E1FBF7965B0B364CD,
 				D59E51F237C33126D69C1FCC,
 				25640EA8175A16B2672D3A48,
+				8F2062F789EB64935860C216,
 			);
 			name = "JUCE Library Code";
 			sourceTree = "<group>";
@@ -835,6 +851,34 @@
 			);
 			name = Source;
 			sourceTree = "<group>";
+		};
+		1476E25BF87E4B6E06F10B1C = {
+			isa = PBXTargetDependency;
+			target = C26582C31C38556308C5002C;
+		};
+		D4926A5DEBFFC5A3805B019B = {
+			isa = PBXTargetDependency;
+			target = 098BE659DA252A0E62AD2B16;
+		};
+		5964FE7D1C2981365E6884F0 = {
+			isa = PBXTargetDependency;
+			target = 00E9E9684AE193664F4FE6E8;
+		};
+		6623A2BFCBEC075612F19CE5 = {
+			isa = PBXTargetDependency;
+			target = AFCFE9A125950C0D6BD599AC;
+		};
+		C1CB3F019F42828F6AD6265D = {
+			isa = PBXTargetDependency;
+			target = AFCFE9A125950C0D6BD599AC;
+		};
+		F3BA28C040A267B9223F53B8 = {
+			isa = PBXTargetDependency;
+			target = AFCFE9A125950C0D6BD599AC;
+		};
+		437062E149397704390DF16C = {
+			isa = PBXTargetDependency;
+			target = AFCFE9A125950C0D6BD599AC;
 		};
 		79399EC4C5E913A5923C1233 = {
 			isa = XCBuildConfiguration;
@@ -933,7 +977,6 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1040,7 +1083,6 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1139,7 +1181,6 @@
 					"JucePlugin_Build_Standalone=1",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
@@ -1234,7 +1275,6 @@
 					"JucePlugin_Build_Unity=0",
 					"JUCE_SHARED_CODE=1",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"/Applications/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
@@ -1279,11 +1319,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1327,10 +1368,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1347,22 +1390,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
-		};
-		A561BA0C1166E268FAC6EC22 = {
-			isa = PBXTargetDependency;
-			target = C26582C31C38556308C5002C;
-		};
-		EECA436C7EBD88E076150895 = {
-			isa = PBXTargetDependency;
-			target = 098BE659DA252A0E62AD2B16;
-		};
-		5F12EB78BA46597A35DAC8A4 = {
-			isa = PBXTargetDependency;
-			target = 00E9E9684AE193664F4FE6E8;
-		};
-		F8E2B701DE6498391AF0DC38 = {
-			isa = PBXTargetDependency;
-			target = AFCFE9A125950C0D6BD599AC;
 		};
 		49ED57A97CF4D027113B3057 = {
 			isa = XCConfigurationList;
@@ -1388,10 +1415,10 @@
 			buildPhases = ( );
 			buildRules = ( );
 			dependencies = (
-				A561BA0C1166E268FAC6EC22,
-				EECA436C7EBD88E076150895,
-				5F12EB78BA46597A35DAC8A4,
-				F8E2B701DE6498391AF0DC38,
+				1476E25BF87E4B6E06F10B1C,
+				D4926A5DEBFFC5A3805B019B,
+				5964FE7D1C2981365E6884F0,
+				6623A2BFCBEC075612F19CE5,
 			);
 			name = "BirlOneHole - All";
 			productName = BirlOneHole;
@@ -1450,7 +1477,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				F8E2B701DE6498391AF0DC38,
+				C1CB3F019F42828F6AD6265D,
 			);
 			name = "BirlOneHole - VST3";
 			productName = BirlOneHole;
@@ -1522,7 +1549,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				F8E2B701DE6498391AF0DC38,
+				F3BA28C040A267B9223F53B8,
 			);
 			name = "BirlOneHole - AU";
 			productName = BirlOneHole;
@@ -1583,7 +1610,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				F8E2B701DE6498391AF0DC38,
+				437062E149397704390DF16C,
 			);
 			name = "BirlOneHole - Standalone Plugin";
 			productName = BirlOneHole;

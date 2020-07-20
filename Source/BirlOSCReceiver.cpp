@@ -1,14 +1,14 @@
 #include "BirlOSCReceiver.h"
+#include "SlideTuning.h"
 
 BirlOSCReceiver::BirlOSCReceiver(BirlOneHoleAudioProcessor& p) : processor(p)
 {
     rcvr.addListener(this);
     connectButton.onClick = [this] { connectButtonClicked(); };
-
-    // Populate maxKeyArgs with 1 for all elements. Replace this with a
-    // better solution inside the function calculations by child classes.
-    for (int i = 0; i < NUM_OF_KEYS; ++i)
-        processor.maxKeyArg[i] = 1;
+    for (int i = 0; i < NUM_OF_KEYS; ++i) {
+        maxKeyArg[i] = 1;
+        minKeyArg[i] = 0;
+    }
 }
 
 BirlOSCReceiver::~BirlOSCReceiver(){}
@@ -18,15 +18,19 @@ void BirlOSCReceiver::oscMessageReceived(const OSCMessage& message){
         int keyIndex{0};
         for (auto* arg = message.begin(); arg != message.end(); ++arg) {
             if (keyIndex < NUM_OF_KEYS) {
-                processor.keys_[keyIndex] = getArgValue(*arg);
-//                if (getArgValue(*arg) > processor.maxKeyArg[keyIndex]) {
-//                    processor.maxKeyArg[keyIndex] = getArgValue(*arg);
-//                }
-//                float beforeclip = (float) getArgValue(*arg) / (processor.maxKeyArg[keyIndex]) * CLIP_RATIO;
-//                processor.keys_[keyIndex] = LEAF_clip(0.0, beforeclip, 1.0);
-//                keySliders[keyIndex].setValue(processor.keys_[keyIndex], dontSendNotification);
+                keys_[keyIndex] = getArgValue(*arg);
+
+                if (getArgValue(*arg) > maxKeyArg[keyIndex]) {
+                    maxKeyArg[keyIndex] = getArgValue(*arg);
+                }
+                float beforeclip = (float) getArgValue(*arg) / (maxKeyArg[keyIndex]);
+                float afterclip = LEAF_clip(0.0, beforeclip, 1.0);
+                keys_[keyIndex] = afterclip;
+                keySliders[keyIndex].setValue(afterclip, dontSendNotification);
+                midiAdjustmentLabel.setText((String)getMidiAdjustment(), dontSendNotification);
+                frequencyLabel.setText((String)getToneholeFrequency(getMidiAdjustment(), OPENHOLE_FREQ, processor.octave), dontSendNotification);
+                processor.frequency = getToneholeFrequency(getMidiAdjustment(), OPENHOLE_FREQ, processor.octave);
                 ++keyIndex;
-                
             }
         }
     }
@@ -35,13 +39,14 @@ void BirlOSCReceiver::oscMessageReceived(const OSCMessage& message){
         for (auto* arg = message.begin(); arg != message.end(); ++arg) {
             if (buttonIndex < NUM_OF_BUTTONS) {
                 if (getArgValue(*arg) == 1) {
-                    processor.buttons_[buttonIndex] = true;
+                    buttons_[buttonIndex] = true;
                     buttonButtons[buttonIndex].setButtonText("ON");
                 }
                 else {
-                    processor.buttons_[buttonIndex] = false;
+                    buttons_[buttonIndex] = false;
                     buttonButtons[buttonIndex].setButtonText("OFF");
                 }
+                processor.octave = getOctaveAdjustment();
                 ++buttonIndex;
             }
         }
@@ -55,7 +60,6 @@ void BirlOSCReceiver::oscMessageReceived(const OSCMessage& message){
                 maxBreathPos_ = currentBreathPos_;
             if (isExhaling_) {
                 processor.gain = LEAF_clip(0.0, currentBreathPos_ / maxBreathPos_, 1.0);
-                
             }
         }
     }
@@ -75,7 +79,6 @@ void BirlOSCReceiver::oscMessageReceived(const OSCMessage& message){
             absBreath_ = getArgValue(*arg);
     }
     triggerAsyncUpdate();
-    DBG((String)processor.gain);
 }
 
 void BirlOSCReceiver::oscBundleReceived (const OSCBundle& bundle){
@@ -125,27 +128,5 @@ void BirlOSCReceiver::handleArgTypeError(){
         "OK");
 }
 
-// Getters and setters for protected variables.
-
-//void BirlOSCReceiver::setMaxBreathPos(double mbp){
-//    maxBreathPos_ = mbp;
-//}
-//void BirlOSCReceiver::setMaxBreathNeg(double mbn){
-//    maxBreathNeg_ = mbn;
-//}
-//void BirlOSCReceiver::setCurrentBreathPos(double cbp){
-//    currentBreathPos_ = cbp;
-//}
-//void BirlOSCReceiver::setCurrentBreathNeg(double cbn){
-//    currentBreathNeg_ = cbn;
-//}
-//void BirlOSCReceiver::setIsExhaling(bool ex){
-//    isExhaling_ = ex;
-//}
-//double BirlOSCReceiver::getMaxBreathPos() {return maxBreathPos_;}
-//double BirlOSCReceiver::getMaxBreathNeg() {return maxBreathNeg_;}
-//double BirlOSCReceiver::getCurrentBreathPos() {return currentBreathPos_;}
-//double BirlOSCReceiver::getCurrentBreathNeg() {return currentBreathNeg_;}
-//bool BirlOSCReceiver::getIsExhaling() {return isExhaling_;}
 
 

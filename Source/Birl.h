@@ -22,7 +22,7 @@ const double RTH_TWEAK_FACTOR = 0.005;
 
 static double originalRth_[MAX_TONEHOLES];
 static double rth_[MAX_TONEHOLES];
-static int tubeLengths_[MAX_TUBES];
+static double tubeLengths_[MAX_TUBES];
 
 
 const int OVERSAMPLE = 1;
@@ -34,6 +34,11 @@ const double reedTableOffset = 0.7;
 const double reedTableSlope = -0.3;
 /* const double MIN_D1 = 0.05; */
 
+static float keys_[NUM_OF_KEYS];
+static bool buttons_[NUM_OF_BUTTONS];
+static int maxKeyArg[NUM_OF_KEYS];
+static int minKeyArg[NUM_OF_KEYS];
+static double keysGradient [NUM_OF_KEYS];
 
 
 
