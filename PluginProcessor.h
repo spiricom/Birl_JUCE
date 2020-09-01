@@ -1,43 +1,45 @@
-
-#ifndef PROCESSORH
-#define PROCESSORH
+#ifndef PROCESSOR_H_
+#define PROCESSOR_H_
 
 #include <JuceHeader.h>
-
-
-#define MEM_SIZE 50000
-#define OPENHOLE_FREQ 349.0
-
+#include "sfx.h"
+#include "Filters.h"
+#include "Tube.h"
 
 //==============================================================================
 /**
 */
-class BirlOscillatorAudioProcessor  : public AudioProcessor
+class BirlAudioProcessor  : public juce::AudioProcessor, private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>, public juce::AsyncUpdater, public juce::MidiInputCallback, public juce::MidiKeyboardStateListener
 {
 public:
     //==============================================================================
-    BirlOscillatorAudioProcessor();
-    ~BirlOscillatorAudioProcessor();
-    double gain{};
-    double frequency{};
-    double filterfrequency{};
+    BirlAudioProcessor();
+    ~BirlAudioProcessor() override;
+    //==============================================================================
+    juce::MidiKeyboardState keyboardState;
+    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
+    void handleNoteOn(juce::MidiKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override;
+    void handleNoteOff(juce::MidiKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override;
+    void setMidiInput();
+    void oscMessageReceived(const juce::OSCMessage&) override;
+    void oscBundleReceived(const juce::OSCBundle&) override;
+    int getArgValue(const juce::OSCArgument&);
+    float getToneholeValue(int index);
+    float getBreathArrayValue(int index);
+    //==============================================================================
+    void handleAsyncUpdate() override;
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
-
    #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
-
-    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
-
+    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     //==============================================================================
-    AudioProcessorEditor* createEditor() override;
+    juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
-
     //==============================================================================
-    const String getName() const override;
-
+    const juce::String getName() const override;
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect() const override;
@@ -47,42 +49,45 @@ public:
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
-    const String getProgramName (int index) override;
-    void changeProgramName (int index, const String& newName) override;
+    const juce::String getProgramName (int index) override;
+    void changeProgramName (int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (MemoryBlock& destData) override;
+    void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-    //==============================================================================
-    tSVF filter1{};
-    tSVF filter2{};
-    float modAmount{10};
+    
+    int controlNumber;
+    int prevControlNumber;
+    bool loading;
+    float interpVal = 0.0f;
+
+    
+    enum Breath {EXHALE, INHALE, NOSIGNAL};
+    int breathing = NOSIGNAL;
+    
+    float currentBreathPos;
+    float maxBreathPos = 0.001;
+    float currentBreathNeg;
+    float maxBreathNeg = 0.001;
+
+    float breath = 0.001;
+    
+    float audio[2];
+
+    juce::AudioProcessorValueTreeState parameters;
 
 private:
-    tSawtooth saw1{};
-    tSawtooth saw2{};
-    tSawtooth saw3{};
     
-    tCycle sin{};
-    tCycle mod{};
 
-    tExpSmooth smoother{};
     
-    // detune array should take MIDI
-    float detune[3] = {0.999, 1.0, 1.001};
-    
-    
-//    Array<tSawtooth> saws;
-//    saws.add
-    char myMemory[MEM_SIZE];
-    float audioBufferTick{};
-    
-    //freq modulation
-    float modTick{};
-    
-    float smoothGain{};
+    /* for osc */
+    bool isAddingFromMidiInput = false;
+    juce::OSCReceiver rcvr;
+    int port;
+    juce::TextButton connectButton{"Connect"};
+    bool isExhaling = false;
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BirlOscillatorAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BirlAudioProcessor)
 };
 
-#endif /*PROCESSORH*/
+#endif
