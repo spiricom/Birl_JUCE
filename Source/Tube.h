@@ -1,6 +1,10 @@
 #ifndef TUBE_H_
 #define TUBE_H_
 
+#include "sfx.h"
+extern LEAF leaf;
+
+LEAF leaf;
 typedef struct _DelayLine {
     double *data;
     int length;
@@ -53,8 +57,8 @@ static inline Tube *initTube(int len) {
     Tube *tube = (Tube *) calloc(1, sizeof(Tube));
 //    tube->upper = initDelayLine(len);
 //    tube->lower = initDelayLine(len);
-    tLinearDelay_init(&tube->upper, len, len+1);
-    tLinearDelay_init(&tube->lower, len, len+1);
+    tLinearDelay_init(&tube->upper, len, len+1, &leaf);
+    tLinearDelay_init(&tube->lower, len, len+1, &leaf);
     return tube;
 }
 
@@ -72,8 +76,8 @@ typedef struct _FracTube {
 
 static inline FracTube *initFracTube(float len) {
     FracTube *fractube = (FracTube *) calloc (1, sizeof(FracTube));
-    tLinearDelay_init(&(fractube->upper), len, int(len+1));
-    tLinearDelay_init(&(fractube->lower), len, int(len+1));
+    tLinearDelay_init(&(fractube->upper), len, int(len+1), &leaf);
+    tLinearDelay_init(&(fractube->lower), len, int(len+1), &leaf);
     return fractube;
 }
 

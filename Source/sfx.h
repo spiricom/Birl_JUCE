@@ -11,6 +11,7 @@
 #include "tunings.h"
 
 
+
 #define SMALL_MEM_SIZE 80328
 #define MED_MEM_SIZE 519000
 #define LARGE_MEM_SIZE 33554432 // size of SDRAM IC
@@ -25,6 +26,7 @@ namespace birl {
 extern char small_memory[SMALL_MEM_SIZE];
 extern char medium_memory[MED_MEM_SIZE];
 extern char large_memory[LARGE_MEM_SIZE];
+
 
 extern tMempool smallPool;
 extern tMempool largePool;

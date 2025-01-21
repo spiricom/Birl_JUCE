@@ -1,32 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="sDOc9m" name="Birl" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginCharacteristicsValue="pluginIsSynth">
   <MAINGROUP id="etFNfs" name="Birl">
+    <GROUP id="{B1C32257-855C-68E7-65F7-08EB040FFB20}" name="UI">
+      <FILE id="IqUoBa" name="panelpm" compile="0" resource="1" file="UI/panelpm"/>
+      <FILE id="cTY9QN" name="panelsynth" compile="0" resource="1" file="UI/panelsynth"/>
+      <FILE id="psfcNX" name="snyderphonics-whitelogo.svg" compile="0" resource="1"
+            file="UI/snyderphonics-whitelogo.svg"/>
+    </GROUP>
     <GROUP id="{AC1D7EBF-9C19-2F7E-0F36-AA2637BB90F5}" name="Source">
-      <FILE id="IS49rh" name="Tube.h" compile="0" resource="0" file="Source/Tube.h"/>
-      <FILE id="JSlNRp" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
-      <FILE id="a0z8e6" name="Filters.h" compile="0" resource="0" file="Source/Filters.h"/>
-      <FILE id="espp2O" name="Birl.h" compile="0" resource="0" file="Source/Birl.h"/>
-      <FILE id="qdQ2G1" name="tunings.cpp" compile="1" resource="0" file="Source/tunings.cpp"/>
-      <FILE id="rrouof" name="tunings.h" compile="0" resource="0" file="Source/tunings.h"/>
-      <FILE id="uo9aoD" name="ui.cpp" compile="1" resource="0" file="Source/ui.cpp"/>
-      <FILE id="v3GDGj" name="ui.h" compile="0" resource="0" file="Source/ui.h"/>
-      <FILE id="gLo39u" name="sfx.cpp" compile="1" resource="0" file="Source/sfx.cpp"/>
-      <FILE id="zaG25w" name="sfx.h" compile="0" resource="0" file="Source/sfx.h"/>
-      <GROUP id="{B1C32257-855C-68E7-65F7-08EB040FFB20}" name="UI">
-        <FILE id="ybXW10" name="panelsynth" compile="0" resource="1" file="Source/UI/panelsynth"/>
-        <FILE id="uMnGdI" name="panelpm" compile="0" resource="1" file="Source/UI/panelpm"/>
-        <FILE id="gx6iti" name="snyderphonics-whitelogo.svg" compile="0" resource="1"
-              file="Source/UI/snyderphonics-whitelogo.svg"/>
+      <GROUP id="{EBEDD9AB-E254-D66A-5880-8617D18BE5AE}" name="Source">
+        <FILE id="a5a3Qr" name="Birl.h" compile="0" resource="0" file="Source/Birl.h"/>
+        <FILE id="ZigNtr" name="Filters.h" compile="0" resource="0" file="Source/Filters.h"/>
+        <FILE id="fFDYgf" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/PluginEditor.cpp"/>
+        <FILE id="a1DADr" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        <FILE id="VeSiVT" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="Source/PluginProcessor.cpp"/>
+        <FILE id="H08nA1" name="PluginProcessor.h" compile="0" resource="0"
+              file="Source/PluginProcessor.h"/>
+        <FILE id="kt8VTy" name="RuleBasedInterface.cpp" compile="1" resource="0"
+              file="Source/RuleBasedInterface.cpp"/>
+        <FILE id="EYxTLT" name="RuleBasedInterface.h" compile="0" resource="0"
+              file="Source/RuleBasedInterface.h"/>
+        <FILE id="mnl1FC" name="sfx.cpp" compile="1" resource="0" file="Source/sfx.cpp"/>
+        <FILE id="i7OFSl" name="sfx.h" compile="0" resource="0" file="Source/sfx.h"/>
+        <FILE id="f98lum" name="Tube.h" compile="0" resource="0" file="Source/Tube.h"/>
+        <FILE id="kMc3ER" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
+        <FILE id="xBpaLk" name="tunings.cpp" compile="1" resource="0" file="Source/tunings.cpp"/>
+        <FILE id="KOkId9" name="tunings.h" compile="0" resource="0" file="Source/tunings.h"/>
+        <FILE id="SZ5xE7" name="ui.cpp" compile="1" resource="0" file="Source/ui.cpp"/>
+        <FILE id="ZzewsW" name="ui.h" compile="0" resource="0" file="Source/ui.h"/>
       </GROUP>
-      <FILE id="VWugbM" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="Source/PluginProcessor.cpp"/>
-      <FILE id="BpeZuu" name="PluginProcessor.h" compile="0" resource="0"
-            file="Source/PluginProcessor.h"/>
-      <FILE id="LNYkcG" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="XtIVhB" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
@@ -49,7 +56,7 @@
         <MODULEPATH id="juce_graphics" path="../../../../../Applications/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../Applications/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../Applications/JUCE/modules"/>
-        <MODULEPATH id="leaf" path="../Leaf-Master"/>
+        <MODULEPATH id="leaf" path="../LEAF"/>
         <MODULEPATH id="juce_osc" path="../../../../../Applications/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
